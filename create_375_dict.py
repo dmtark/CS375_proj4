@@ -45,7 +45,7 @@ def pdf_to_string(pdf_filename: str) -> str:
     raw = parser.from_file(pdf_filename)
     raw_data = raw['content']
     pdf_string = str(raw_data)
-    return words
+    return pdf_string
 
 
 def pdf_file_names(directory: str) -> list:
