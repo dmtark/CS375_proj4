@@ -60,18 +60,6 @@ def find_edit_distance_iterative(S: str, T: str) -> int:
         # if current cells have different letters, add one to minimum between left, up, and diagonol
         # if the same, add zero to the minimum of those
 
-def empirical_differences(S,T):
-    '''Find empirical running time'''
-    start_recursive = timer()
-    recursive_num = find_edit_distance_recursive(S, T)
-    end_recursive = timer()
-    start_iter = timer()
-    iter_num = find_edit_distance_iterative(S, T)
-    end_iter = timer()
-    # if recursive_num == iter_num:
-    return (end_recursive - start_recursive), (end_iter - start_iter)
-    # else:
-        # return 0,0
 
 def lots_of_em(dict): #dict is a dictionary of S,T words to mispell and find edit distance?
     start_recursive = timer()
