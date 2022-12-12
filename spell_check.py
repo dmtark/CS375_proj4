@@ -8,15 +8,26 @@ class SpellCheck:
         self.dict_name = dict_name
         self.text = "this is a semple santence with a frw gramnatixal erors"
 
-
-    def load_dictionary(self):
+        # load_dictionary
         with open(self.dict_name, 'r') as f:
             lines = []
             for line in f:
-                lines.append(line.strip())
-        return lines
+                lines.append(line.strip().lower())
 
-    def edit_distance(self, S, T):
+        self.word_set = set(lines)
+
+
+    # def load_dictionary(self) -> list:
+    #     """Return a list of the words contained in a dictionary file."""
+    #     with open(self.dict_name, 'r') as f:
+    #         lines = []
+    #         for line in f:
+    #             lines.append(line.strip())
+    #     return lines
+
+
+    def edit_distance(self, S: str, T: str) -> int:
+        """Return the edit distance from s to t iteratively."""
         s = len(S)
         t = len(T)
         result = [[0] * (t + 1) for _ in range(s+ 1)]
@@ -40,21 +51,22 @@ class SpellCheck:
             # if current cells have different letters, add one to minimum between left, up, and diagonol
             # if the same, add zero to the minimum of those
 
-    def spell_check_word(self, word):
-        dictionary = self.load_dictionary()
+    def spell_check_word(self, word: str) -> list:
+        """Return a list containing the closest word to input word."""
+        dictionary = self.word_set
         min_words = []
         min_distance = 1000
         for correct_word in dictionary:
             dist = self.edit_distance(word, correct_word)
             if dist < min_distance:
-                min_words = [correct_word]
+                min_words = [correct_word] # all of the words with min_distance
                 min_distance = dist
             elif dist == min_distance:
                 min_words.append(correct_word)
         return min_words
 
     def spell_check_text(self):
-        dictionary = self.load_dictionary()
+        dictionary = self.word_set
         for word in self.text.split():
             word = word.lower() # interesting... names??
             word = word.strip(".,!/;'")
