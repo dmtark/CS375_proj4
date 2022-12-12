@@ -1,17 +1,22 @@
+# spell check file for unimproved spell check
+from tika import parser
+import re
+
 class SpellCheck:
+    def __init__(self, latex_filename, dict_name):
+        self.latex_filename = latex_filename
+        self.dict_name = dict_name
+        self.text = "this is a semple santence with a frw gramnatixal erors"
 
-    def __init__(filename):
-        this.filename = filename
 
-
-    def load_dictionary(filename):
-        with open(self.filename, 'r') as f:
+    def load_dictionary(self):
+        with open(self.dict_name, 'r') as f:
             lines = []
             for line in f:
                 lines.append(line.strip())
         return lines
 
-    def edit_distance(S, T):
+    def edit_distance(self, S, T):
         s = len(S)
         t = len(T)
         result = [[0] * (t + 1) for _ in range(s+ 1)]
@@ -35,11 +40,12 @@ class SpellCheck:
             # if current cells have different letters, add one to minimum between left, up, and diagonol
             # if the same, add zero to the minimum of those
 
-    def spell_check_word(word, dictionary):
+    def spell_check_word(self, word):
+        dictionary = self.load_dictionary()
         min_words = []
         min_distance = 1000
         for correct_word in dictionary:
-            dist = edit_distance(word, correct_word)
+            dist = self.edit_distance(word, correct_word)
             if dist < min_distance:
                 min_words = [correct_word]
                 min_distance = dist
@@ -47,48 +53,27 @@ class SpellCheck:
                 min_words.append(correct_word)
         return min_words
 
-    def spell_check(text, dictionary):
-        for word in text.split():
+    def spell_check_text(self):
+        dictionary = self.load_dictionary()
+        for word in self.text.split():
             word = word.lower() # interesting... names??
             word = word.strip(".,!/;'")
             if word not in dictionary:
-                print("wrong word: " + word)
-                correct_word = spell_check_word(word, dictionary)
-                print("correct word: " + str(correct_word))
+                print("\nMispelled word: " + word)
+                potential_correct_words = self.spell_check_word(word)
+                print("Potential correct words: " + str(potential_correct_words))
+        return potential_correct_words
 
-    def spell_check_better(text, dictionary):
-        dict_set = set(dictionary) # will have O(1) lookup time
-        for word in text.split():
-            word = word.lower() # interesting... names??
-            word = word.strip(".,!/;'")
-            if word not in dict_set:
-                print("wrong word: " + word)
-                correct_word = spell_check_word(word, dictionary)
-                print("correct word: " + str(correct_word))
-
-
-    def pick_best_word(potential_words, original_word):
-        final_words = []
-        for word in potential_words:
-            if word[0] == original_word:
-                final_words.append(word)
-        return final_words
-
+    def run_spell_check(self):
+        return self.spell_check_text()
 
 
 def main():
-    # S = "aaaDaniel"
-    # T = "DanielTarkoff"
+    spell_check1 = SpellCheck('cs375f22_SA3.pdf', 'en_US-large.txt')
 
-    # result = edit_distance(S, T)
-    # print(result)
+    print("Running normal spell check:\n")
+    spell_check = spell_check1.run_spell_check()
+    print(spell_check)
 
-    test1 = SpellCheck('sample.txt')
-
-    text = "Hello. My namm is Daniel and I donnut like to go shoping"
-    dictionary = load_dictionary('en_US-large.txt')
-    spell_check(text, dictionary)
-
-
-
-main()
+if __name__ == "__main__":
+    main()
