@@ -1,12 +1,13 @@
 # spell check file for unimproved spell check
 from tika import parser
 import re
+import sys
 
 class SpellCheck:
-    def __init__(self, latex_filename, dict_name):
-        self.latex_filename = latex_filename
+    def __init__(self, pdf_filename, dict_name, text):
+        self.pdf_filename = pdf_filename
         self.dict_name = dict_name
-        self.text = "this is a semple santence with a frw gramnatixal erors"
+        # self.text = "this is a semple santence with a frw gramnatixal erors"
 
         # load_dictionary
         with open(self.dict_name, 'r') as f:
@@ -16,14 +17,11 @@ class SpellCheck:
 
         self.word_set = set(lines)
 
-
-    # def load_dictionary(self) -> list:
-    #     """Return a list of the words contained in a dictionary file."""
-    #     with open(self.dict_name, 'r') as f:
-    #         lines = []
-    #         for line in f:
-    #             lines.append(line.strip())
-    #     return lines
+        # load in pdf file
+        raw = parser.from_file(pdf_filename)
+        raw_data = raw['content']
+        pdf_string = str(raw_data)
+        self.text = pdf_string
 
 
     def edit_distance(self, S: str, T: str) -> int:
@@ -65,6 +63,7 @@ class SpellCheck:
                 min_words.append(correct_word)
         return min_words
 
+
     def spell_check_text(self):
         dictionary = self.word_set
         for word in self.text.split():
@@ -81,7 +80,7 @@ class SpellCheck:
 
 
 def main():
-    spell_check1 = SpellCheck('cs375f22_SA3.pdf', 'en_US-large.txt')
+    spell_check1 = SpellCheck('cs375f22_SA3.pdf', 'en_US-large.txt', 'cs375f22_SA3.pdf')
 
     print("Running normal spell check:\n")
     spell_check = spell_check1.run_spell_check()
