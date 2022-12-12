@@ -68,7 +68,12 @@ class SpellCheck:
         dictionary = self.word_set
         for word in self.text.split():
             word = word.lower() # interesting... names??
-            word = word.strip(".,!/;'")
+            # word = word.strip(".,!/;'")
+            word = word.strip("1234567890")
+            word = re.sub(r'[^a-zA-Z0-9]', '', word)
+            word = re.sub(r"[\n\t\s]*", "", word)
+            if word == "":
+                continue
             if word not in dictionary:
                 print("\nMispelled word: " + word)
                 potential_correct_words = self.spell_check_word(word)
