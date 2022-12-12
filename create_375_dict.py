@@ -40,6 +40,14 @@ def parse_latex_file(pdf_filename: str) -> set:
     return set(words) # do not want duplicates...
 
 
+def pdf_to_string(pdf_filename: str) -> str:
+    """Return a string of raw text contained in a pdf."""
+    raw = parser.from_file(pdf_filename)
+    raw_data = raw['content']
+    pdf_string = str(raw_data)
+    return words
+
+
 def pdf_file_names(directory: str) -> list:
     """Return a list of the pdf filenames in a given directory."""
     all_files = os.listdir(directory)
@@ -69,9 +77,13 @@ def write_set_to_txt_file(word_set: set, filepath: str) -> None:
 
 def main():
     names = pdf_file_names("./assignments")
-    print(names)
-    master_set = master_set_from_pdf_list(names)
-    write_set_to_txt_file(master_set, "cs375_word_set.txt")
+    # print(names)
+    # master_set = master_set_from_pdf_list(names)
+    # write_set_to_txt_file(master_set, "cs375_word_set.txt")
+
+    for name in names:
+        print(pdf_to_string(name))
+        break
 
 
 if __name__ == "__main__":
