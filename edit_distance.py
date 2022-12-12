@@ -2,13 +2,44 @@ from timeit import default_timer as timer
 
 
 def find_edit_distance_recursive(s: str, t: str) -> int:
-    """Return the edit distance of one string to another."""
+    """Return the edit distance of s to t recursively."""
+    if s == "" or t == "":
+        if s == "":
+            return len(t)
+        elif t == "":
+            return len(s)
+    else:
+        if s[len(s) - 1] == t[len(t) - 1]:
+            return find_edit_distance_recursive(
+                s[0:len(s) - 1],
+                t[0:len(t) - 1]
+            )
+        else:
+            min_val = min(
+                find_edit_distance_recursive(
+                    s[0:len(s) - 1],
+                    t[0:len(t) - 1]
+                ),
+                find_edit_distance_recursive(
+                    s[0:len(s) - 1],
+                    t[0:len(t)]
+                ),
+                find_edit_distance_recursive(
+                    s[0:len(s)],
+                    t[0:len(t) - 1]
+                ),
+            )
+
+            return min_val + 1
 
 
-def find_edit_distance(S, T):
+def find_edit_distance_iterative(S: str, T: str) -> int:
+    """Return the edit distance from s to t iteratively."""
     s = len(S)
     t = len(T)
+    # Create a table for storing values
     result = [[0] * (t + 1) for _ in range(s + 1)]
+    # Populate table with 0s on the top row and left column
     for i in range(s + 1):
         result[i][0] = i
     for j in range(t + 1):
@@ -58,9 +89,14 @@ def lots_of_em(dict): #dict is a dictionary of S,T words to mispell and find edi
 
 
 def main():
-    print(find_edit_distance("bear", "brie"))
-    print(find_edit_distance("aaacolby", "colby"))
-    print(find_edit_distance("speaker", "speaks"))
+    print("recursive")
+    print(find_edit_distance_recursive("bear", "brie"))
+    print(find_edit_distance_recursive("aaacolby", "colby"))
+    print(find_edit_distance_recursive("speaker", "speaks"))
+    print("iterative")
+    print(find_edit_distance_iterative("bear", "brie"))
+    print(find_edit_distance_iterative("aaacolby", "colby"))
+    print(find_edit_distance_iterative("speaker", "speaks"))
 
 
 if __name__ == "__main__":
