@@ -7,7 +7,7 @@ import sys
 
 class Improvements:
 
-    def __init__(self, pdf_filename, dict_name, text):
+    def __init__(self, pdf_filename, dict_name):
         self.pdf_filename = pdf_filename
         self.dict_name = dict_name
 
