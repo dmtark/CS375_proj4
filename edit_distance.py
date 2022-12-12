@@ -1,6 +1,6 @@
 
 def find_edit_distance_recursive(s: str, t: str) -> int:
-    """Return the edit distance of one string to another."""
+    """Return the edit distance of s to t recursively."""
     if s == "" or t == "":
         if s == "":
             return len(t)
@@ -31,10 +31,13 @@ def find_edit_distance_recursive(s: str, t: str) -> int:
             return min_val + 1
 
 
-def find_edit_distance(S, T):
+def find_edit_distance_iterative(S: str, T: str) -> int:
+    """Return the edit distance from s to t iteratively."""
     s = len(S)
     t = len(T)
+    # Create a table for storing values
     result = [[0] * (t + 1) for _ in range(s + 1)]
+    # Populate table with 0s on the top row and left column
     for i in range(s + 1):
         result[i][0] = i
     for j in range(t + 1):
@@ -57,9 +60,14 @@ def find_edit_distance(S, T):
 
 
 def main():
+    print("recursive")
     print(find_edit_distance_recursive("bear", "brie"))
     print(find_edit_distance_recursive("aaacolby", "colby"))
     print(find_edit_distance_recursive("speaker", "speaks"))
+    print("iterative")
+    print(find_edit_distance_iterative("bear", "brie"))
+    print(find_edit_distance_iterative("aaacolby", "colby"))
+    print(find_edit_distance_iterative("speaker", "speaks"))
 
 
 if __name__ == "__main__":
