@@ -66,7 +66,7 @@ def empirical_differences(S,T):
     recursive_num = find_edit_distance_recursive(S, T)
     end_recursive = timer()
     start_iter = timer()
-    iter_num = find_edit_distance(S, T)
+    iter_num = find_edit_distance_iterative(S, T)
     end_iter = timer()
     # if recursive_num == iter_num:
     return (end_recursive - start_recursive), (end_iter - start_iter)
@@ -81,7 +81,7 @@ def lots_of_em(dict): #dict is a dictionary of S,T words to mispell and find edi
 
     start_iter = timer()
     for word in dict.items():
-        find_edit_distance(word[0],word[1])
+        find_edit_distance_iterative(word[0],word[1])
     end_iter = timer()
 
     return (end_recursive - start_recursive), (end_iter - start_iter)
