@@ -68,17 +68,17 @@ def multiple_trials():
                 'jnin':'water', 'llugh':'laugh', 'eig':'eight', 'ninine':'nine', 'teni':'tennis'}
     for i in range(10):
         start_recursive = timer()
-        for x in range(0,i):
+        for x in range(0,i**2):
             for word in my_dict.items():
                 find_edit_distance_recursive(word[0],word[1])
         end_recursive = timer()
 
         start_iter = timer()
-        for x in range(0,i):
+        for x in range(0,i**2):
             for word in my_dict.items():
                 find_edit_distance_iterative(word[0],word[1])
         end_iter = timer()
-
+        print(i**2)
         iter_list.append(end_iter-start_iter)
         recur_list.append(end_recursive-start_recursive)
     return iter_list,recur_list
