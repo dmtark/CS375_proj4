@@ -61,18 +61,27 @@ def find_edit_distance_iterative(S: str, T: str) -> int:
         # if the same, add zero to the minimum of those
 
 
-def lots_of_em(dict): #dict is a dictionary of S,T words to mispell and find edit distance?
-    start_recursive = timer()
-    for word in dict.items():
-        find_edit_distance_recursive(word[0],word[1])
-    end_recursive = timer()
+def multiple_trials():
+    iter_list = []
+    recur_list = []
+    my_dict = {'crozy':'crazy', 'elehabet':'elephant', 'grapt':'graph', 'grann':'grown', 'krll':'kill',
+                'jnin':'water', 'llugh':'laugh', 'eig':'eight', 'ninine':'nine', 'teni':'tennis'}
+    for i in range(10):
+        start_recursive = timer()
+        for x in range(0,i):
+            for word in my_dict.items():
+                find_edit_distance_recursive(word[0],word[1])
+        end_recursive = timer()
 
-    start_iter = timer()
-    for word in dict.items():
-        find_edit_distance_iterative(word[0],word[1])
-    end_iter = timer()
+        start_iter = timer()
+        for x in range(0,i):
+            for word in my_dict.items():
+                find_edit_distance_iterative(word[0],word[1])
+        end_iter = timer()
 
-    return (end_recursive - start_recursive), (end_iter - start_iter)
+        iter_list.append(end_iter-start_iter)
+        recur_list.append(end_recursive-start_recursive)
+    return iter_list,recur_list
 
 
 
