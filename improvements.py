@@ -121,12 +121,19 @@ class Improvements:
     def spell_check_text(self):
         for word in self.text.split():
             word = word.lower() # interesting... names??
-            word = word.strip(".,!/;'")
-            if word not in self.word_set:
+            # word = word.strip(".,!/;'()0123456789:`")
+
+            word = word.strip("1234567890")
+            word = re.sub(r'[^a-zA-Z0-9]', '', word)
+            word = re.sub(r"[\n\t\s]*", "", word)
+
+
+
+            if word not in self.word_set and len(word) != 0:
                 print("\nMispelled word: " + word)
                 (min_words, secondary) = self.spell_check_word_improved(word)
-                print("Minimum edit distance words:\n" + min_words)
-                print("\nSecondary edit distance words:\n" + secondary)
+                print("Minimum edit distance words:\n" + str(min_words))
+                print("Secondary edit distance words:\n" + str(secondary) + "\n\n\n")
 
         return "Replacement: " + max(min_words + secondary, key=lambda x: score(x, word))
 
@@ -134,7 +141,7 @@ class Improvements:
         return self.spell_check_text()
 
 def main():
-    improvement = Improvements('cs375f22_SA3.pdf', 'en_US-large.txt', 'cs375f22_SA3.pdf')
+    improvement = Improvements('CS375f22_proj4_DynamicProgramming.pdf', 'cs375_dict.txt')
     print(improvement.spell_check_text())
 
 if __name__ == "__main__":
