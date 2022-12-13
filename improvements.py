@@ -2,8 +2,8 @@ from temp import edit_distance
 from tika import parser
 import re
 import sys
+import pprint
 
-# TODO: make load_dictionary method a field
 
 class Improvements:
 
@@ -26,8 +26,7 @@ class Improvements:
         pdf_string = str(raw_data)
         self.text = pdf_string
 
-    def getNeighbors(self, node):
-        graph = { "a" : ["q", "w", "s", "z"],
+        self.graph = { "a" : ["q", "w", "s", "z"],
                 "b" : ["v", "g", "h", "n"],
                 "c" : ["x", "d", "f", "v"],
                 "d" : ["s", "e", "r", "f", "v", "c", "x"],
@@ -55,7 +54,9 @@ class Improvements:
                 "z" : ["a", "s", "x"]
             }
 
-        return graph.get(node, [node])
+    def getNeighbors(self, node):
+        "Return a list of neighbors of node"
+        return self.graph.get(node, [node])
         # second [node] gives us default
 
 
@@ -110,8 +111,8 @@ class Improvements:
 
     def get_score(self, orig_word, min_words):
         word_scores = {}
-        print("The typo:", orig_word)
-        print("The minimum words:", min_words)
+        # print("The typo:", orig_word)
+        # print("The minimum words:", min_words)
         for suggested_word in min_words:
             # strip word and original word, then revert back to list
             correct_chars = set(suggested_word).difference(set(orig_word))
@@ -126,59 +127,85 @@ class Improvements:
                     if cc in neighbors:
                         score = score + 1
             # add the score to the word
-            word_scores[suggested_word] = [self.find_edit_distance(orig_word, suggested_word), score]
+            word_scores[suggested_word] = score
 
         return word_scores
 
 
-    # def score(self, potential, real):
-    #     # how do we want to weight this??
-    #     score = 10 - self.find_edit_distance(potential, real)
-    #     if potential[0] == real[0]:
-    #         score += 1
-    #     if len(potential) == len(real):
-    #         score += 1
-    #     if potential[-1] == real[-1]:
-    #         score += 1
-    #     print(potential + " score: " + str(score))
-    #     return score
-    #     # takes in a word, gives us a "score" for a word - return the word with the maximum score
+
+    ## WE SHOULD HAVE ONE METHOD THAT SPELL CHECKS ONE WORD
+    ## WE SHOULD HAVE ANOTHER METHOD THAT SPELL CHECKS AN ENTIRE STRING OF WORDS
 
 
-    def spell_check_text(self):
-        for word in self.text.split():
-            word = word.lower() # interesting... names??
-            # word = word.strip(".,!/;'()0123456789:`")
-
-            word = word.strip("1234567890")
-            word = re.sub(r'[^a-zA-Z0-9]', '', word)
-            word = re.sub(r"[\n\t\s]*", "", word)
-
-            if word not in self.word_set and len(word) != 0:
-                # print("\nMispelled word: " + word)
-                (min_words, secondary) = self.spell_check_word_improved(word)
-                scores = self.get_score(word,min_words)
+    def spell_check_word(self, word:str):
+        """Return a tuple (spelled_correctly, best_suggestion).
+        Receives a pre-cleaned word."""
+        if word in self.word_set:
+            spelled_correctly = True
+            best_suggestion = word
+        else:
+            spelled_correctly = False
+            # get suggested words
+            (min_words, secondary) = self.spell_check_word_improved(word)
+            # if there is only one suggestion, return it
+            if len(min_words) == 1:
+                best_suggestion = min_words[0]
+            else:
+                # get the scores of all minimum words
+                scores = self.get_score(word, min_words)
 
                 # get the best score
                 best_score = -1
-                best_word = None
-                for x in scores:
-                    if scores[x][1] > best_score:
-                        best_word = x
-                        best_score = int(word_scores[x][1])
-                # print(scores)
-                # print("Minimum edit distance words:\n" + str(min_words))
-                # print("Secondary edit distance words:\n" + str(secondary) + "\n\n\n")
+                for score in scores:
+                    suggestion_score = scores[score]
+                    # if this is the best score yet
+                    if suggestion_score > best_score:
+                        best_suggestion = score
+                        best_score = suggestion_score
+
+        return spelled_correctly, best_suggestion
 
 
-        # return "Replacement: " + max(min_words + secondary, key=lambda x: score(x, word))
+    def spell_check_text(self) -> list:
+        """Return a list of misspelled words.
+        Each index has form:
+        (text_index, misspelled_word, best_suggestion)."""
+
+        # create a list of misspelled words
+        typo_list = []
+
+        for index, word in enumerate(self.text.split()):
+            # make lowercase
+            word = word.lower()
+            # # remove numbers
+            # word = word.strip("1234567890")
+            # remove anything that's not a lowercase letter
+            word = re.sub(r'[^a-z]', '', word)
+            # # remove all whitespace
+            # word = re.sub(r"[\n\t\s]*", "", word)
+
+            if len(word) > 0:
+
+                spelled_correctly, best_suggestion = self.spell_check_word(word)
+
+                if not spelled_correctly:
+                    # add the index, misspelled word, and best suggestion to the typo list
+                    typo_list.append(
+                        (index, word, best_suggestion)
+                    )
+
+        return typo_list
+
 
     def run_spell_check(self):
-        return self.spell_check_text()
+        """Print the typos in readable format."""
+        pp = pprint.PrettyPrinter(indent=4)
+        pp.pprint( self.spell_check_text() )
 
 def main():
     improvement = Improvements('cs375f22_hw0.pdf', 'cs375_word_set.txt')
-    improvement.get_score("fyn", ["fun", "fin"])
+    improvement.run_spell_check()
+    # improvement.get_score("fyn", ["fun", "fin"])
 
 if __name__ == "__main__":
     main()
