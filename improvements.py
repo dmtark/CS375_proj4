@@ -89,6 +89,8 @@ class Improvements:
 
 
     def spell_check_word_improved(self, word):
+        """Return two lists:
+        lowest edit distance and second-lowest edit distance."""
         min_words = []
         min_words_secondary = []
         min_distance = 1000
@@ -105,8 +107,7 @@ class Improvements:
             elif min_distance < dist < min_distance_secondary:
                 min_distance_secondary = dist
                 min_words_secondary = [correct_word]
-            elif dist == min_distance:
-                min_distance.append(correct_word)
+                
         return min_words, min_words_secondary
 
     def get_score(self, orig_word, min_words):
