@@ -10,6 +10,7 @@ class Improvements:
     def __init__(self, pdf_filename, dict_name):
         self.pdf_filename = pdf_filename
         self.dict_name = dict_name
+        self.word_scores = {}
 
         # load_dictionary
         with open(self.dict_name, 'r') as f:
@@ -58,11 +59,13 @@ class Improvements:
         # second [node] gives us default
 
 
-    def improved_edit_distance(self, S, T):
-
+    def find_edit_distance(self, S: str, T: str) -> int:
+        """Return the edit distance from s to t iteratively."""
         s = len(S)
         t = len(T)
-        result = [[0] * (t + 1) for _ in range(s+ 1)]
+        # Create a table for storing values
+        result = [[0] * (t + 1) for _ in range(s + 1)]
+        # Populate table with 0s on the top row and left column
         for i in range(s + 1):
             result[i][0] = i
         for j in range(t + 1):
@@ -70,16 +73,18 @@ class Improvements:
 
         for i in range(1, s+1):
             for j in range(1, t+1):
-                # making list of potential values for this spot in the array
-                # three options we always have + 2 other options: if equal to matching character, that's the best option; or: 
-                potential_values = [result[i-1][j] + 1, result[i][j-1] + 1, result[i-1][j-1] + 1]
+                # left: result[i-1][j]
+                # up: result[i][j-1]
+                # diagnol: result[i-1][j-1]
                 if S[i-1] == T[j-1]: # same
-                    potential_values.append(result[i-1][j-1])
-                elif S[i-1] in self.getNeighbors(T[j-1]):
-                    # in the neighbor list
-                    potential_values.append(result[i-1][j-1] + 0.5) # maybe change value from 0.5 to something else            
-                result[i][j] = min(potential_values)
+                    result[i][j] = result[i-1][j-1]
+                else:
+                    min_val = min( result[i-1][j], result[i][j-1], result[i-1][j-1] )
+                    result[i][j] = 1 + min_val
+
         return result[s][t]
+            # if current cells have different letters, add one to minimum between left, up, and diagonol
+            # if the same, add zero to the minimum of those
 
 
     def spell_check_word_improved(self, word):
@@ -88,7 +93,7 @@ class Improvements:
         min_distance = 1000
         min_distance_secondary = 1000
         for correct_word in self.word_set:
-            dist = self.improved_edit_distance(word, correct_word)
+            dist = self.find_edit_distance(word, correct_word)
             if dist < min_distance:
                 min_words_secondary = min_words
                 min_distance_secondary = min_distance
@@ -103,19 +108,41 @@ class Improvements:
                 min_distance.append(correct_word)
         return min_words, min_words_secondary
 
+    def get_score(self, orig_word, min_words):
+        word_scores = {}
+        print("The typo:", orig_word)
+        print("The minimum words:", min_words)
+        for suggested_word in min_words:
+            # strip word and original word, then revert back to list
+            correct_chars = set(suggested_word).difference(set(orig_word))
+            chars_changed  = set(orig_word).difference(set(suggested_word))
+            correct_chars = list(correct_chars)
+            chars_changed = list(chars_changed)
+            score = 0
+            # for each correct character, see if the changed character is a neighbor of the new correct character
+            for c in correct_chars:
+                neighbors = self.getNeighbors(c)
+                for cc in chars_changed:
+                    if cc in neighbors:
+                        score = score + 1
+            # add the score to the word
+            word_scores[suggested_word] = [self.find_edit_distance(orig_word, suggested_word), score]
 
-    def score(self, potential, real):
-        # how do we want to weight this??
-        score = 10 - self.improved_edit_distance(potential, real)
-        if potential[0] == real[0]:
-            score += 1
-        if len(potential) == len(real):
-            score += 1
-        if potential[-1] == real[-1]:
-            score += 1
-        print(potential + " score: " + str(score))
-        return score
-        # takes in a word, gives us a "score" for a word - return the word with the maximum score
+        return word_scores
+
+
+    # def score(self, potential, real):
+    #     # how do we want to weight this??
+    #     score = 10 - self.find_edit_distance(potential, real)
+    #     if potential[0] == real[0]:
+    #         score += 1
+    #     if len(potential) == len(real):
+    #         score += 1
+    #     if potential[-1] == real[-1]:
+    #         score += 1
+    #     print(potential + " score: " + str(score))
+    #     return score
+    #     # takes in a word, gives us a "score" for a word - return the word with the maximum score
 
 
     def spell_check_text(self):
@@ -127,22 +154,31 @@ class Improvements:
             word = re.sub(r'[^a-zA-Z0-9]', '', word)
             word = re.sub(r"[\n\t\s]*", "", word)
 
-
-
             if word not in self.word_set and len(word) != 0:
-                print("\nMispelled word: " + word)
+                # print("\nMispelled word: " + word)
                 (min_words, secondary) = self.spell_check_word_improved(word)
-                print("Minimum edit distance words:\n" + str(min_words))
-                print("Secondary edit distance words:\n" + str(secondary) + "\n\n\n")
+                scores = self.get_score(word,min_words)
 
-        return "Replacement: " + max(min_words + secondary, key=lambda x: score(x, word))
+                # get the best score
+                best_score = -1
+                best_word = None
+                for x in scores:
+                    if scores[x][1] > best_score:
+                        best_word = x
+                        best_score = int(word_scores[x][1])
+                # print(scores)
+                # print("Minimum edit distance words:\n" + str(min_words))
+                # print("Secondary edit distance words:\n" + str(secondary) + "\n\n\n")
+
+
+        # return "Replacement: " + max(min_words + secondary, key=lambda x: score(x, word))
 
     def run_spell_check(self):
         return self.spell_check_text()
 
 def main():
-    improvement = Improvements('CS375f22_proj4_DynamicProgramming.pdf', 'cs375_dict.txt')
-    print(improvement.spell_check_text())
+    improvement = Improvements('cs375f22_hw0.pdf', 'cs375_word_set.txt')
+    improvement.get_score("fyn", ["fun", "fin"])
 
 if __name__ == "__main__":
     main()
