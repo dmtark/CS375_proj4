@@ -78,12 +78,12 @@ def write_set_to_txt_file(word_set: set, filepath: str) -> None:
 def main():
     names = pdf_file_names("./assignments")
     # print(names)
-    # master_set = master_set_from_pdf_list(names)
-    # write_set_to_txt_file(master_set, "cs375_word_set.txt")
+    master_set = master_set_from_pdf_list(names)
+    write_set_to_txt_file(master_set, "cs375_word_set.txt")
 
-    for name in names:
-        print(pdf_to_string(name))
-        break
+    # for name in names:
+    #     print(pdf_to_string(name))
+    #     break
 
 
 if __name__ == "__main__":

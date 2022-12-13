@@ -23,6 +23,16 @@ class Improvements:
         # load in pdf file
         raw = parser.from_file(pdf_filename)
         raw_data = raw['content']
+        # print(f"type of raw_data: {type(raw_data)}")
+        # # print(f"raw data:{raw_data}")
+        # print(f"raw data only dashes:{raw_data.split('-')}")
+        # a = f"{raw_data[793]}"
+        # print(a)
+        # print(f"raw data:{raw_data[620]}")
+        # print(u"_" + a + u"_")
+        # print(len(a))
+        # print(ord(a))
+
         pdf_string = str(raw_data)
         self.text = pdf_string
 
@@ -53,6 +63,8 @@ class Improvements:
                 "y" : ["t", "g", "h", "u"],
                 "z" : ["a", "s", "x"]
             }
+
+        print("object created")
 
     def getNeighbors(self, node):
         "Return a list of neighbors of node"
@@ -107,7 +119,7 @@ class Improvements:
             elif min_distance < dist < min_distance_secondary:
                 min_distance_secondary = dist
                 min_words_secondary = [correct_word]
-                
+
         return min_words, min_words_secondary
 
     def get_score(self, orig_word, min_words):
@@ -176,6 +188,8 @@ class Improvements:
         typo_list = []
 
         for index, word in enumerate(self.text.split()):
+        # for index, word in enumerate(re.split('\s|\u8212|\u0045', self.text)):
+            
             # make lowercase
             word = word.lower()
             # # remove numbers
@@ -204,7 +218,8 @@ class Improvements:
         pp.pprint( self.spell_check_text() )
 
 def main():
-    improvement = Improvements('cs375f22_hw0.pdf', 'cs375_word_set.txt')
+    # improvement = Improvements('assignments/CS375f22_proj4_DynamicProgramming.pdf', 'cs375_combined_set.txt')
+    improvement = Improvements('CS375f22_proj4_DynamicProgramming.pdf', 'cs375_word_set.txt')
     improvement.run_spell_check()
     # improvement.get_score("fyn", ["fun", "fin"])
 
