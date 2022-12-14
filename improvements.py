@@ -1,9 +1,7 @@
 from temp import edit_distance
 from tika import parser
 import re
-import sys
 import pprint
-import csv
 
 
 class Improvements:
@@ -28,6 +26,7 @@ class Improvements:
         pdf_string = str(raw_data)
         self.text = pdf_string
 
+        # keyboard adjacency map
         self.graph = { "a" : ["q", "w", "s", "z"],
                 "b" : ["v", "g", "h", "n"],
                 "c" : ["x", "d", "f", "v"],
@@ -177,7 +176,6 @@ class Improvements:
         typo_list = []
 
         for index, word in enumerate(self.text.split()):
-        # for index, word in enumerate(re.split('\s|\u8212|\u0045', self.text)):
             
             # make lowercase
             word = word.lower()
@@ -196,16 +194,6 @@ class Improvements:
 
         return typo_list
 
-    def write_to_csv(self, dictionary):
-        fields = ['Misspelled Word', 'Improved Number of Suggestions']
-        rows = []
-        for item in dictionary:
-            rows.append([item, dictionary[item]])
-
-        with open('improvements_dict.csv', 'w') as csvfile: 
-            csvwriter = csv.writer(csvfile) 
-            csvwriter.writerow(fields) 
-            csvwriter.writerows(rows)
 
     def run_spell_check(self):
         """Print the typos in readable format."""
