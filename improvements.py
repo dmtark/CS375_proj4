@@ -24,15 +24,6 @@ class Improvements:
         # load in pdf file
         raw = parser.from_file(pdf_filename)
         raw_data = raw['content']
-        # print(f"type of raw_data: {type(raw_data)}")
-        # # print(f"raw data:{raw_data}")
-        # print(f"raw data only dashes:{raw_data.split('-')}")
-        # a = f"{raw_data[793]}"
-        # print(a)
-        # print(f"raw data:{raw_data[620]}")
-        # print(u"_" + a + u"_")
-        # print(len(a))
-        # print(ord(a))
 
         pdf_string = str(raw_data)
         self.text = pdf_string
@@ -146,11 +137,6 @@ class Improvements:
         return word_scores
 
 
-
-    ## WE SHOULD HAVE ONE METHOD THAT SPELL CHECKS ONE WORD
-    ## WE SHOULD HAVE ANOTHER METHOD THAT SPELL CHECKS AN ENTIRE STRING OF WORDS
-
-
     def spell_check_word(self, word:str):
         """Return a tuple (spelled_correctly, best_suggestion).
         Receives a pre-cleaned word."""
@@ -204,12 +190,8 @@ class Improvements:
             
             # make lowercase
             word = word.lower()
-            # # remove numbers
-            # word = word.strip("1234567890")
             # remove anything that's not a lowercase letter
             word = re.sub(r'[^a-z]', '', word)
-            # # remove all whitespace
-            # word = re.sub(r"[\n\t\s]*", "", word)
 
             if len(word) > 0:
 
@@ -240,14 +222,8 @@ class Improvements:
         pp.pprint( self.spell_check_text() )
 
 def main():
-    # improvement = Improvements('CS375f22_proj4_DynamicProgramming.pdf', 'mit_top_10000.txt')
-    # improvement = Improvements('CS375f22_proj4_DynamicProgramming.pdf', 'rupert_top_1000.txt')
-    improvement = Improvements('CS375f22_proj4_DynamicProgramming.pdf', 'cs375_combined_set.txt')
-    typo_list = improvement.spell_check_text()
-    improvement_dict = improvement.get_improved_dict(typo_list)
-    improvement.write_to_csv(improvement_dict)
-
-    # improvement.get_score("fyn", ["fun", "fin"])
+    improvement = Improvements('CS375f22_proj4_DynamicProgramming.pdf', 'cs375_word_set.txt')
+    improvement.run_spell_check()
 
 
 if __name__ == "__main__":

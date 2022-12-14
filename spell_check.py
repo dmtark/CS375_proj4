@@ -3,6 +3,7 @@ from tika import parser
 import re
 import sys
 import csv
+import pprint
 
 class SpellCheck:
     def __init__(self, pdf_filename, dict_name):
@@ -104,12 +105,8 @@ class SpellCheck:
             
             # make lowercase
             word = word.lower()
-            # # remove numbers
-            # word = word.strip("1234567890")
             # remove anything that's not a lowercase letter
             word = re.sub(r'[^a-z]', '', word)
-            # # remove all whitespace
-            # word = re.sub(r"[\n\t\s]*", "", word)
 
             if len(word) > 0:
 
@@ -160,16 +157,16 @@ class SpellCheck:
         return self.spell_check_text_basic()
 
 
+    def print_spell_check(self):
+        """Print the typos in readable format."""
+        pp = pprint.PrettyPrinter(indent=4)
+        pp.pprint( self.spell_check_text_basic() )
+
+
 def main():
     basic = SpellCheck('CS375f22_proj4_DynamicProgramming.pdf', 'cs375_word_set.txt')
+    basic.print_spell_check()
 
-    print("Running normal spell check:\n")
-    spell_check = basic.run_spell_check()
-
-    typo_list = basic.spell_check_text_basic()
-    print(typo_list)
-    basic_dict = basic.get_basic_dict(typo_list)
-    basic.write_to_csv(basic_dict)
 
 if __name__ == "__main__":
     main()
