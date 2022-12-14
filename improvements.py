@@ -3,6 +3,7 @@ from tika import parser
 import re
 import sys
 import pprint
+import csv
 
 
 class Improvements:
@@ -177,8 +178,17 @@ class Improvements:
                     if suggestion_score > best_score:
                         best_suggestion = score
                         best_score = suggestion_score
-
         return spelled_correctly, best_suggestion, num_suggestions
+
+
+    def get_improved_dict(self, typo_list):
+        # creates and returns a dictionary containing:
+            # key: misspelled word
+            # value: the length of the suggested replacements (only the primary words)
+        improvement_dict = {}
+        for i, item in enumerate(typo_list):
+            improvement_dict[typo_list[i][1]] = typo_list[i][3]
+        return improvement_dict
 
 
     def spell_check_text(self) -> list:
@@ -213,6 +223,16 @@ class Improvements:
 
         return typo_list
 
+    def write_to_csv(self, dictionary):
+        fields = ['Misspelled Word', 'Improved Number of Suggestions']
+        rows = []
+        for item in dictionary:
+            rows.append([item, dictionary[item]])
+
+        with open('improvements_dict.csv', 'w') as csvfile: 
+            csvwriter = csv.writer(csvfile) 
+            csvwriter.writerow(fields) 
+            csvwriter.writerows(rows)
 
     def run_spell_check(self):
         """Print the typos in readable format."""
@@ -222,9 +242,13 @@ class Improvements:
 def main():
     # improvement = Improvements('CS375f22_proj4_DynamicProgramming.pdf', 'mit_top_10000.txt')
     # improvement = Improvements('CS375f22_proj4_DynamicProgramming.pdf', 'rupert_top_1000.txt')
-    improvement = Improvements('CS375f22_proj4_DynamicProgramming.pdf', 'cs375_word_set.txt')
-    improvement.run_spell_check()
+    improvement = Improvements('CS375f22_proj4_DynamicProgramming.pdf', 'cs375_combined_set.txt')
+    typo_list = improvement.spell_check_text()
+    improvement_dict = improvement.get_improved_dict(typo_list)
+    improvement.write_to_csv(improvement_dict)
+
     # improvement.get_score("fyn", ["fun", "fin"])
+
 
 if __name__ == "__main__":
     main()
