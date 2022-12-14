@@ -4,7 +4,7 @@ import re
 import sys
 
 class SpellCheck:
-    def __init__(self, pdf_filename, dict_name, text):
+    def __init__(self, pdf_filename, dict_name):
         self.pdf_filename = pdf_filename
         self.dict_name = dict_name
         # self.text = "this is a semple santence with a frw gramnatixal erors"
@@ -49,7 +49,7 @@ class SpellCheck:
             # if current cells have different letters, add one to minimum between left, up, and diagonol
             # if the same, add zero to the minimum of those
 
-    def spell_check_word(self, word: str) -> list:
+    def spell_check_word_basic(self, word: str) -> list:
         """Return a list containing the closest word to input word."""
         dictionary = self.word_set
         min_words = []
@@ -63,8 +63,51 @@ class SpellCheck:
                 min_words.append(correct_word)
         return min_words
 
+    
+    def get_basic_dict(self, typo_list):
+        # creates and returns a dictionary containing:
+            # key: misspelled word
+            # value: the length of the suggested replacements (only the primary words)
+        basic_dict = {}
+        for i, item in enumerate(typo_list):
+            improvement_dict[typo_list[i][1]] = typo_list[i][3]
+        return basic_dict
 
-    def spell_check_text(self):
+
+    def spell_check_text_basic(self) -> list:
+        """Return a list of misspelled words.
+        Each index has form:
+        (text_index, misspelled_word, best_suggestion)."""
+
+        # create a list of misspelled words
+        typo_list = []
+
+        for index, word in enumerate(self.text.split()):
+        # for index, word in enumerate(re.split('\s|\u8212|\u0045', self.text)):
+            
+            # make lowercase
+            word = word.lower()
+            # # remove numbers
+            # word = word.strip("1234567890")
+            # remove anything that's not a lowercase letter
+            word = re.sub(r'[^a-z]', '', word)
+            # # remove all whitespace
+            # word = re.sub(r"[\n\t\s]*", "", word)
+
+            if len(word) > 0:
+
+                min_words = self.spell_check_word_basic(word)
+
+                if not spelled_correctly:
+                    # add the index, misspelled word, and best suggestion to the typo list
+                    typo_list.append(
+                        (index, word, best_suggestion, num_suggestions)
+                    )
+
+        return typo_list
+
+    '''
+    def spell_check_text(self, verbose=False):
         dictionary = self.word_set
         for word in self.text.split():
             word = word.lower() # interesting... names??
@@ -78,18 +121,37 @@ class SpellCheck:
                 print("\nMispelled word: " + word)
                 potential_correct_words = self.spell_check_word(word)
                 print("Potential correct words: " + str(potential_correct_words))
+        if verbose:
+            return word, potential_correct_words
+
         return potential_correct_words
+    '''
+
+    def write_to_csv(self, dictionary):
+        fields = ['Misspelled Word', 'Improved Number of Suggestions']
+        rows = []
+        for item in dictionary:
+            rows.append([item, dictionary[item]])
+
+        with open('basic_dict.csv', 'w') as csvfile: 
+            csvwriter = csv.writer(csvfile) 
+            csvwriter.writerow(fields) 
+            csvwriter.writerows(rows)
+        
 
     def run_spell_check(self):
-        return self.spell_check_text()
+        return self.spell_check_text_basic()
 
 
 def main():
-    spell_check1 = SpellCheck('cs375f22_SA3.pdf', 'en_US-large.txt', 'cs375f22_SA3.pdf')
+    basic = SpellCheck('CS375f22_proj4_DynamicProgramming.pdf', 'cs375_word_set.txt')
 
     print("Running normal spell check:\n")
-    spell_check = spell_check1.run_spell_check()
-    print(spell_check)
+    spell_check = basic.run_spell_check()
+
+    typo_list = basic.spell_check_text_basic()
+    basic_dict = basic.get_basic_dict(typo_list)
+    basic.write_to_csv(basic_dict)
 
 if __name__ == "__main__":
     main()
