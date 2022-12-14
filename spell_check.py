@@ -2,6 +2,7 @@
 from tika import parser
 import re
 import sys
+import csv
 
 class SpellCheck:
     def __init__(self, pdf_filename, dict_name):
@@ -63,6 +64,22 @@ class SpellCheck:
                 min_words.append(correct_word)
         return min_words
 
+
+    def spell_check_word_with_edit_distance(self, word:str):
+        """Return a tuple (spelled_correctly, suggestions, num_suggestions).
+        Receives a pre-cleaned word."""
+        if word in self.word_set:
+            spelled_correctly = True
+            suggestions = [word]
+            num_suggestions = 0
+        else:
+            spelled_correctly = False
+            # get suggested words
+            min_words = self.spell_check_word_basic(word)
+            suggestions = min_words
+            num_suggestions = len(min_words)
+        return spelled_correctly, suggestions, num_suggestions
+
     
     def get_basic_dict(self, typo_list):
         # creates and returns a dictionary containing:
@@ -70,14 +87,14 @@ class SpellCheck:
             # value: the length of the suggested replacements (only the primary words)
         basic_dict = {}
         for i, item in enumerate(typo_list):
-            improvement_dict[typo_list[i][1]] = typo_list[i][3]
+            basic_dict[typo_list[i][1]] = typo_list[i][3]
         return basic_dict
 
 
     def spell_check_text_basic(self) -> list:
         """Return a list of misspelled words.
         Each index has form:
-        (text_index, misspelled_word, best_suggestion)."""
+        (text_index, misspelled_word, suggestions, num_suggestions)."""
 
         # create a list of misspelled words
         typo_list = []
@@ -96,12 +113,12 @@ class SpellCheck:
 
             if len(word) > 0:
 
-                min_words = self.spell_check_word_basic(word)
+                spelled_correctly, min_words, num_suggestions = self.spell_check_word_with_edit_distance(word)
 
                 if not spelled_correctly:
                     # add the index, misspelled word, and best suggestion to the typo list
                     typo_list.append(
-                        (index, word, best_suggestion, num_suggestions)
+                        (index, word, min_words, num_suggestions)
                     )
 
         return typo_list
@@ -150,6 +167,7 @@ def main():
     spell_check = basic.run_spell_check()
 
     typo_list = basic.spell_check_text_basic()
+    print(typo_list)
     basic_dict = basic.get_basic_dict(typo_list)
     basic.write_to_csv(basic_dict)
 
