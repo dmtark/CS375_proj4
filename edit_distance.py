@@ -1,4 +1,8 @@
 from timeit import default_timer as timer
+from time import perf_counter
+import pprint
+
+from improvements import Improvements
 
 
 def find_edit_distance_recursive(s: str, t: str) -> int:
@@ -84,6 +88,46 @@ def multiple_trials():
     return iter_list,recur_list
 
 
+def all_combinations():
+    time_trial_info = []
+
+    dict_files = [
+        "en_US-large.txt",
+        "cs375_word_set.txt",
+        "mit_top_10000.txt",
+        "rupert_top_1000.txt"
+    ]
+
+    pdf_name = "CS375f22_proj4_DynamicProgramming.pdf"
+
+    for dict_file in dict_files:
+        print(f"starting dict: {dict_file}")
+
+        start = perf_counter()
+
+        improvement = Improvements(pdf_name, dict_file)
+        misspelled = improvement.spell_check_text()
+
+        end = perf_counter()
+
+        # add the time to a tuple
+        time_diff = end - start
+        num_misspelled = len(misspelled)
+
+        time_trial_info.append(
+            (time_diff, num_misspelled)
+        )
+
+    return time_trial_info
+
+
+def print_combinations(combinations):
+    pp = pprint.PrettyPrinter(indent=4)
+    pp.pprint(combinations)
+
+
+
+
 
 def main():
     # print("recursive")
@@ -94,7 +138,15 @@ def main():
     # print(find_edit_distance_iterative("bear", "brie"))
     # print(find_edit_distance_iterative("aaacolby", "colby"))
     # print(find_edit_distance_iterative("speaker", "speaks"))
-    print(multiple_trials())
+
+    data = multiple_trials()
+
+    diff = [data[0][i] - data[1][i] for i in range(10)]
+
+    print_combinations(diff)
+
+    # combos = all_combinations()
+    # print_combinations(combos)
 
 
 if __name__ == "__main__":
