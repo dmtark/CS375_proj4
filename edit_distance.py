@@ -51,21 +51,20 @@ def find_edit_distance_iterative(S: str, T: str) -> int:
 
     for i in range(1, s+1):
         for j in range(1, t+1):
-            # left: result[i-1][j]
-            # up: result[i][j-1]
-            # diagnol: result[i-1][j-1]
-            if S[i-1] == T[j-1]: # same
+            if S[i-1] == T[j-1]:
                 result[i][j] = result[i-1][j-1]
             else:
                 min_val = min( result[i-1][j], result[i][j-1], result[i-1][j-1] )
                 result[i][j] = 1 + min_val
 
     return result[s][t]
-        # if current cells have different letters, add one to minimum between left, up, and diagonol
-        # if the same, add zero to the minimum of those
 
 
 def multiple_trials():
+    '''Runs both recursive and iterative edit distance methods 
+    with simulated increasing input sizes and returns two lists
+    of times, one for recursive and iterative. It returns the time
+    taken to run the edit_distance on each input size.'''
     iter_list = []
     recur_list = []
     my_dict = {'crozy':'crazy', 'elehabet':'elephant', 'grapt':'graph', 'grann':'grown', 'krll':'kill',
@@ -88,65 +87,19 @@ def multiple_trials():
     return iter_list,recur_list
 
 
-def all_combinations():
-    time_trial_info = []
-
-    dict_files = [
-        "en_US-large.txt",
-        "cs375_word_set.txt",
-        "mit_top_10000.txt",
-        "rupert_top_1000.txt"
-    ]
-
-    pdf_name = "CS375f22_proj4_DynamicProgramming.pdf"
-
-    for dict_file in dict_files:
-        print(f"starting dict: {dict_file}")
-
-        start = perf_counter()
-
-        improvement = Improvements(pdf_name, dict_file)
-        misspelled = improvement.spell_check_text()
-
-        end = perf_counter()
-
-        # add the time to a tuple
-        time_diff = end - start
-        num_misspelled = len(misspelled)
-
-        time_trial_info.append(
-            (time_diff, num_misspelled)
-        )
-
-    return time_trial_info
-
-
-def print_combinations(combinations):
-    pp = pprint.PrettyPrinter(indent=4)
-    pp.pprint(combinations)
 
 
 
 
 
 def main():
-    # print("recursive")
-    # print(find_edit_distance_recursive("bear", "brie"))
-    # print(find_edit_distance_recursive("aaacolby", "colby"))
-    # print(find_edit_distance_recursive("speaker", "speaks"))
-    # print("iterative")
-    # print(find_edit_distance_iterative("bear", "brie"))
-    # print(find_edit_distance_iterative("aaacolby", "colby"))
-    # print(find_edit_distance_iterative("speaker", "speaks"))
+    print("Recursive:")
+    print(find_edit_distance_recursive("bear", "brie"))
+    print("Iterative:")
+    print(find_edit_distance_iterative("bear", "brie"))
 
-    data = multiple_trials()
+    print(multiple_trials())
 
-    diff = [data[0][i] - data[1][i] for i in range(10)]
-
-    print_combinations(diff)
-
-    # combos = all_combinations()
-    # print_combinations(combos)
 
 
 if __name__ == "__main__":
