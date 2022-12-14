@@ -156,10 +156,12 @@ class Improvements:
         if word in self.word_set:
             spelled_correctly = True
             best_suggestion = word
+            num_suggestions = 0
         else:
             spelled_correctly = False
             # get suggested words
             (min_words, secondary) = self.spell_check_word_improved(word)
+            num_suggestions = len(min_words)
             # if there is only one suggestion, return it
             if len(min_words) == 1:
                 best_suggestion = min_words[0]
@@ -176,7 +178,7 @@ class Improvements:
                         best_suggestion = score
                         best_score = suggestion_score
 
-        return spelled_correctly, best_suggestion
+        return spelled_correctly, best_suggestion, num_suggestions
 
 
     def spell_check_text(self) -> list:
@@ -201,12 +203,12 @@ class Improvements:
 
             if len(word) > 0:
 
-                spelled_correctly, best_suggestion = self.spell_check_word(word)
+                spelled_correctly, best_suggestion, num_suggestions = self.spell_check_word(word)
 
                 if not spelled_correctly:
                     # add the index, misspelled word, and best suggestion to the typo list
                     typo_list.append(
-                        (index, word, best_suggestion)
+                        (index, word, best_suggestion, num_suggestions)
                     )
 
         return typo_list
@@ -218,7 +220,8 @@ class Improvements:
         pp.pprint( self.spell_check_text() )
 
 def main():
-    # improvement = Improvements('assignments/CS375f22_proj4_DynamicProgramming.pdf', 'cs375_combined_set.txt')
+    # improvement = Improvements('CS375f22_proj4_DynamicProgramming.pdf', 'mit_top_10000.txt')
+    # improvement = Improvements('CS375f22_proj4_DynamicProgramming.pdf', 'rupert_top_1000.txt')
     improvement = Improvements('CS375f22_proj4_DynamicProgramming.pdf', 'cs375_word_set.txt')
     improvement.run_spell_check()
     # improvement.get_score("fyn", ["fun", "fin"])
