@@ -168,16 +168,6 @@ class Improvements:
         return spelled_correctly, best_suggestion, num_suggestions
 
 
-    def get_improved_dict(self, typo_list):
-        # creates and returns a dictionary containing:
-            # key: misspelled word
-            # value: the length of the suggested replacements (only the primary words)
-        improvement_dict = {}
-        for i, item in enumerate(typo_list):
-            improvement_dict[typo_list[i][1]] = typo_list[i][3]
-        return improvement_dict
-
-
     def spell_check_text(self) -> list:
         """Return a list of misspelled words.
         Each index has form:
