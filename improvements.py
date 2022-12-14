@@ -56,10 +56,9 @@ class Improvements:
                 "z" : ["a", "s", "x"]
             }
 
-        print("object created")
 
     def getNeighbors(self, node):
-        "Return a list of neighbors of node"
+        """Return a list of neighbors of node."""
         return self.graph.get(node, [node])
         # second [node] gives us default
 
@@ -115,6 +114,8 @@ class Improvements:
         return min_words, min_words_secondary
 
     def get_score(self, orig_word, min_words):
+        """Return the scores of suggested words based on keyboard adjacency.
+        Higher scores mean higher keyboard adjacency."""
         word_scores = {}
         # print("The typo:", orig_word)
         # print("The minimum words:", min_words)
